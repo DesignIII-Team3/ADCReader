@@ -56,20 +56,18 @@ int main(void)
 
   char str[100];
   strcpy(str, "hello\n");
-  uint16_t value;
+  UART_item value;
 
   /* Infinite loop */
   while (1){
 
 	  //uart_sendString(str);
 
-	  if(!CBuffer16b_isEmpty()){
+	  if(!CBufferUART_isEmpty()){
 
-		  CBuffer16b_read( (uint16_t*)&value );
-		  sprintf(str, "%i\n", value);
+		  CBufferUART_read( &value );
 
-		  uart_sendString(str);
-		  //uart_sendCommande( 0, (void*)&value, sizeof(value) );
+		  uart_sendCommande( value.cmd, (void*)&value.data, value.size );
 	  }
 
   }

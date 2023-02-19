@@ -4,3 +4,6 @@ CircularBuffer.c:44:5:CBuffer8b_isEmpty	4	static
 CircularBuffer.c:52:5:CBuffer16b_write	16	static
 CircularBuffer.c:68:5:CBuffer16b_read	16	static
 CircularBuffer.c:84:5:CBuffer16b_isEmpty	4	static
+CircularBuffer.c:95:5:CBufferUART_write	12	static
+CircularBuffer.c:111:5:CBufferUART_read	24	static
+CircularBuffer.c:127:5:CBufferUART_isEmpty	4	static
