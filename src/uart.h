@@ -10,6 +10,9 @@
 
 #define SIZE_CIRCULAR_BUFFER 20
 
+#define CMD_VMEASURE 0x00
+#define CMD_AMEASURE 0x01
+
 /**
  * Configurer le uart1
  */

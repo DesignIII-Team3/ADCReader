@@ -85,3 +85,46 @@ int CBuffer16b_isEmpty()
 {
 	return buffer16b_head == buffer16b_queue;
 }
+
+// *******************************************************************
+// UART buffer
+// *******************************************************************
+
+volatile unsigned int item_in_bufferUART= 0;
+
+int CBufferUART_write(UART_item p_data)
+{
+	if(item_in_bufferUART>= BUFFER_SIZE) return 0;
+
+	circular_bufferUART[bufferUART_head] = p_data;		// mettre data dans le buffer
+
+	bufferUART_head++;								// incrementer pos head
+	item_in_bufferUART++;
+
+	if(bufferUART_head >= BUFFER_SIZE){				// si tete = ou > que taille buffer
+		bufferUART_head = 0;						// alors retour a 0
+	}
+
+	return 0;
+}
+
+int CBufferUART_read(UART_item* r_data)
+{
+	if(CBufferUART_isEmpty()) return -1;				// retourne 0 si buffer est vide
+
+	*r_data = circular_bufferUART[bufferUART_queue];	// mettre valeur a pos head dans r_data
+
+	bufferUART_queue++;								// incrementer pos queue
+	item_in_bufferUART--;
+
+	if(bufferUART_queue >= BUFFER_SIZE){			// si tete = ou > que taille buffer
+		bufferUART_queue = 0;						// alors retour a 0
+	}
+
+	return 0;
+}
+
+int CBufferUART_isEmpty()
+{
+	return bufferUART_head == bufferUART_queue;
+}

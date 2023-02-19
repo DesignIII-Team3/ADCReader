@@ -26,7 +26,7 @@ void Timer_configure()
 
 	TIM6->DIER |= TIM_DIER_UIE;
 
-	TIM6->PSC = 2687;
+	TIM6->PSC = 672;	// freq : 8Hz
 	TIM6->ARR = 9999;
 
 	// reinitialise timer et met a jour registre
