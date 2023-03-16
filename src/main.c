@@ -35,6 +35,7 @@ SOFTWARE.
 #include "CircularBuffer.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Private macro */
 /* Private variables */
@@ -50,25 +51,24 @@ SOFTWARE.
 */
 int main(void)
 {
-  Timer_configure();
-  ADC_configure();
-  uart_configure();
+	Timer_configure();
+	ADC_configure();
+	uart_configure();
 
-  char str[100];
-  strcpy(str, "hello\n");
-  UART_item value;
+	while(1){
 
-  /* Infinite loop */
-  while (1){
+		char* str = (char*)malloc(sizeof(char));
+		for(int i=0; i < NB_MESURE; i++){
 
-	  //uart_sendString(str);
+			while(&data[i] >= data_head);
 
-	  if(!CBufferUART_isEmpty()){
+			sprintf(str, "%i\n",data[i]);
+			uart_sendString(str);
+		}
 
-		  CBufferUART_read( &value );
+		data_head = data;
 
-		  uart_sendCommande( value.cmd, (void*)&value.data, value.size );
-	  }
-
-  }
+		ADC_Cmd(ADC1, ENABLE);
+		ADC_Cmd(ADC2, ENABLE);
+	}
 }

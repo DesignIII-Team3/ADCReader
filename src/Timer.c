@@ -19,6 +19,7 @@ void Timer_configure()
 	 */
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
 	// Seulement overflow/underflow genere interruption
 	TIM6->CR1 |= TIM_CR1_URS;
@@ -26,8 +27,8 @@ void Timer_configure()
 
 	TIM6->DIER |= TIM_DIER_UIE;
 
-	TIM6->PSC = 672;	// freq : 8Hz
-	TIM6->ARR = 9999;
+	TIM6->PSC = 2688;	// freq : 10Hz
+	TIM6->ARR = 999;
 
 	// reinitialise timer et met a jour registre
 	TIM6->EGR |= TIM_EGR_UG;
@@ -46,7 +47,17 @@ void Timer_configure()
 	NVIC_EnableIRQ(TIM6_DAC_IRQn);							// active les interruption du timer
 
 	TIM_Cmd(TIM6, ENABLE);
+
+	// GPIO D12
+	RCC->AHB1ENR |= (BIT3 | BIT0);
+
+	GPIOD->MODER |= (BIT24 | BIT26 | BIT28 | BIT30);	// set les bit 24, 26, 28, 30 a 1
+	GPIOD->OTYPER = 0;
+	GPIOD->OSPEEDR |= 0xFF << 23;
+	GPIOD->PUPDR |= 0;
 }
+
+
 
 void TIM6_DAC_IRQHandler()
 {

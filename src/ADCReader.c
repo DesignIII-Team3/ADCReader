@@ -11,14 +11,19 @@
 #include "CircularBuffer.h"
 #include "macros_utiles.h"
 #include "uart.h"
+#include <stdlib.h>
+#include "Filter.h"
 
-#define NB_MEASURE 4
+int compare( const void* a, const void* b);
+
+uint16_t mesures_courant[NB_MEASURE] = {0};
+uint16_t* ptr_mesure_courant = mesures_courant;
 
 void ADC_configure()
 {
 	// Clock configure
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1| RCC_APB2Periph_ADC2, ENABLE);//ADC3 is connected to the APB2 peripheral bus
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1| RCC_APB2Periph_ADC2, ENABLE);
 
 	// GPIO configure
 	GPIO_InitTypeDef GPIO_initStruct;
@@ -75,14 +80,39 @@ void ADC_startConversion()
 	ADC_SoftwareStartConv(ADC1);	// demarrage de la conversion pour la prise de mesure sur les deux ADCs
 }
 
+volatile uint16_t data[NB_MESURE] = {0};
+volatile uint16_t* data_head = data;
+
 void ADC_IRQHandler(void)
 {
+
+	if(data_head > &data[NB_MESURE-1]){
+		ADC_Cmd(ADC1, DISABLE);
+		ADC_Cmd(ADC2, DISABLE);
+
+		char* test;
+		sprintf(test, "head = %i, end = %i", data_head, &data[NB_MESURE-1]);
+		uart_sendString(test);
+
+		return;	// ignorer si toutes es mesures sont faites
+	}
+
+	GPIOD->ODR ^= (1 << 12);
+	*data_head = (uint16_t)ADC_GetConversionValue(ADC2);
+	data_head++;
+
+	ADC_GetConversionValue(ADC1);
+
+
+	/*
 	static unsigned int count = 0;											// fait la moyenne sur NB_MEASURE mesures
 	static UART_item uart_data_tension = {CMD_VMEASURE, 0, type_uint16_t};	// pour envoyer mesures de tension
 	static UART_item uart_data_courant = {CMD_AMEASURE, 0, type_uint16_t};	// pour envoyer mesures de courant
 
 	uart_data_tension.data += (uint64_t)ADC_GetConversionValue(ADC1);	// recuperer mesure tension et sommer pour la moyenne
 	uart_data_courant.data += (uint64_t)ADC_GetConversionValue(ADC2);	// recuperer mesure de courant et sommer pour la moyenne
+	//uint16_t courant = (uint64_t)ADC_GetConversionValue(ADC2);
+	//mesures_courant[count] = courant;
 
 	count++; // incrementer compteur pour la moyenne
 
@@ -91,6 +121,9 @@ void ADC_IRQHandler(void)
 	if(count == NB_MEASURE){
 		uart_data_tension.data = (int)(uart_data_tension.data / NB_MEASURE);	// calcul de la moyenne de la tension
 		uart_data_courant.data = (int)(uart_data_courant.data / NB_MEASURE);	// calcul de la moyenne du courant
+
+
+		//uart_data_courant.data = (uint64_t)mesures_courant[MEDIANE];
 
 		CBufferUART_write(uart_data_tension);	// donnees mise dans le buffer pour envoie
 		CBufferUART_write(uart_data_courant);	// donnees mise dans le buffer pour envoie
@@ -101,5 +134,5 @@ void ADC_IRQHandler(void)
 
 		count = 0;	// retour du compteur a 0 pour reprendre de nouvelles mesures
 	}
-
+	*/
 }

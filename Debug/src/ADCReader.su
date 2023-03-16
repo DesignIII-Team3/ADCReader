@@ -1,4 +1,0 @@
-core_cm4.h:1452:22:NVIC_EnableIRQ	16	static
-ADCReader.c:17:6:ADC_configure	56	static
-ADCReader.c:73:6:ADC_startConversion	8	static
-ADCReader.c:78:6:ADC_IRQHandler	32	static

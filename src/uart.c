@@ -2,7 +2,7 @@
  * uart.c
  *
  *  Created on: 15 nov. 2022
- *      Author: andrea
+ *      Author: sebri
  */
 
 #include "stm32f4xx.h"
